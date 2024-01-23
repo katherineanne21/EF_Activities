@@ -303,19 +303,44 @@ If there are a lot of files in the directory, you can start typing the file name
 
 1. [A] **Evaluate the following:**
    - a.	ln(1)
+```{r}
+log(1)
+```
    - b.	ln(0)
+```{r}
+log(0)
+```
    - c.	ln(e)
+```{r}
+log(exp(1))
+```
    - d.	ln(-5)
+```{r}
+log(-5)
+```
    - e.	-ln(5)
+```{r}
+-log(5)
+```
    - f.	ln(1/5)
+```{r}
+log(1/5)
+```
    - g.	How does R represent when the output of a function is not a number?
+   NaN
 
 2.	[B] **What is the difference between log and log10?**  (Hint: use help!)
+    log is log base e and log10 is log base 10.
 
 3.	[A] **Pythagorean theorem**
   - a.	Given a right triangle with sides `a` and `b`, write a few lines of code that will calculate the length of the hypotenuse. Make sure to use variables in this calculations, not hard-coded numbers.
   - b.	Try out your code with `a=5` and `b=13`.
-
+```{r}
+a = 5
+b = 13
+c = sqrt((a^2)+(b^2))
+c
+```
 
 ## Sequences
 
@@ -392,7 +417,14 @@ prod(1:10)		## product of values in a vector
 ## ★ Questions (4-5)
 
 4.	[A] **Generate a sequence of even numbers from -6 to 6**
+```{r}
+-6:6
+```
 5.	[B] **Generate a sequence of values from -4.8 to -3.43 that is length 8** (show code)
+```{r}
+seq(from = -4.8, to = -3.43, length.out = 8) 
+```
+
 
 ## R Scripts
 
@@ -494,7 +526,10 @@ mylist
 ## ★ Questions (6)
 
 6.	[A] **Create a character vector that contains the names of 4 people you admire.**
-
+```{r}
+people_admire = c("Collin Brooks", "Mary Ranking", "Robert Irwin")
+people_admire
+```
 
 ## Loading and Saving Data
 
