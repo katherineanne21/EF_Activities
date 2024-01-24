@@ -78,8 +78,8 @@ All Rmd documents should start with a section that looks something like this:
 
 ```
 ---
-title: "My Lab"
-author: "My Name"
+title: "Lab1_Rein"
+author: "Katherine Rein"
 output: html_document
 ---
 ```
@@ -1151,7 +1151,7 @@ met |>  summarise(avg = mean(AirTemp))
   
   b. [B] **Use apply to calculate the across-population standard deviations in the numbers of frogs and tadpoles**
 ```{r}
-apply()  
+apply(dat[1:5,1:2], MARGIN = 2, FUN = sd)
 ```
   
 
@@ -1204,7 +1204,7 @@ plot(dat$frogs,dat$tadpoles,
      )
 legend("topleft",  ## draw legend in top corner
        c("Red no spot","Blue no spot","Red spots","Blue Spots"), ## legend text (vector)
-       pch = c(1,1,2,2),                      ## matching vectors of plot characters adn color
+       pch = c(1,1,2,2),                      ## matching vectors of plot characters and color
        col = c("red","blue","red","blue"),
        cex = 1.3
        )
@@ -1241,8 +1241,24 @@ In addition to rendering plots directly within Markdown, within the Plot window,
 
 ## ★ Questions (16-18)
 16. [A] **Plot a histogram of blue frogs**
+
+```{r}
+bluefrogs = dplyr::filter(dat, color == "blue")
+hist(bluefrogs$frogs)
+```
+
 17. [A] **Plot shortwave (solar) radiation against time**
+
+```{r}
+plot(met$time, met$ShortWave, cex = 0.5, xlab = "Time", ylab = "Shortwave Radiation (Watts)")
+```
+
 18. [B] **Plot shortwave (solar) radiation against relative humidity**
+
+```{r}
+plot(met$RelHum, met$ShortWave, cex = 0.5, xlab = "Relative Humidity", ylab = "Shortwave Radiation (Watts)")
+```
+
 
 ## Tidyverse
 
@@ -1271,20 +1287,85 @@ Once the tool launches use it to answer the following questions. Note that you w
 * When you do this you’ll see a lot of new syntax. First, the `%>%` is known as the _pipe operator_ and is used string together multiple functions. So here we see that we start with the met data, then we filter it based upon time, then we call ggplot(). After we call ggplot we see that the different parts of the figure are added together using a `+`. First, we use `aes` (aesthetic) to select the data being used. Then `geom_histogram` is called to plot a histogram, with additional arguments for the number of bins and the fill color (in this case specified using a hexadecimal color code). Next, we see axis labels being set using the `labs` command. Finally we see the theme that’s been applied.
 * Turn in the code for drawing your histogram
 
+```{r}
+library(ggplot2)
+library(dplyr)
+
+met %>%
+ filter(time >= "2013-05-28 00:00:00" & time <= "2013-09-03 00:00:00") %>%
+ ggplot() +
+  aes(x = AirTemp) +
+  geom_histogram(bins = 15L, fill = "#FFA6D2") +
+  labs(
+    x = "Air Temperature (C)",
+    y = "Frequency",
+    title = "Air Temperature Histogram"
+  ) +
+  theme_minimal()
+```
+
 20. [B] **Density plot**
 * With the same data loaded up click on the “Histogram” icon in the top left you can see that you can also change the type of plot drawn. Click “density” to see how the plot changes and how the underlying code changes.
 * Play with the options to get a plot you like
 * Using Export, turn in the code for drawing your density plot 
- 
+
+```{r}
+met %>%
+ filter(time >= "2013-05-28 00:00:00" & time <= "2013-09-03 00:00:00") %>%
+ ggplot() +
+  aes(x = AirTemp) +
+  geom_density(adjust = 0.4, fill = "#FFA6D2") +
+  labs(
+    x = "Air Temperature (C)",
+    y = "Density",
+    title = "Air Temperature Density Plot"
+  ) +
+  theme_minimal() 
+``` 
+
 21. [A] **Line plot**
 * Returning to the ggplot builder, next drag “time” into the X box, which should turn the plot into a time series line plot.
 * As before you can play with label, plot options, data filtering, etc
 * Export this code to your Rmd as well and briefly explain (in text) what has changed in your code from the histogram plot
 
+```{r}
+met %>%
+ filter(time >= "2013-05-28 00:00:00" & time <= "2013-09-03 00:00:00") %>%
+ ggplot() +
+  aes(x = time, y = AirTemp) +
+  geom_line(colour = "#911F58") +
+  labs(
+    x = "Time",
+    y = "Air Temperature (C)",
+    title = "Air Temperature v Time"
+  ) +
+  theme_minimal()
+```
+
+The major change is that the aes function now has a y = section. Obviously this also means that axis title options have been updated as well.
+
+
 22. [B] **Colored line plot**
 * Drag the “shortwave” data into the “Color” box. This should now cause the color of the line to change as a function of the incoming solar radiation
 * After playing with options, export this code as well
 * Describe the impact that Shortwave radiation has on air temperature. Note both the diurnal (daily) cycle (How does temperature change as shortwave increases and deceases throughout the day? When is temperature at its max and min?) and across days (How does shortwave radiation impact the amplitude of the diurnal cycle?). Note: to be able to see diurnal cycles clearly you’ll need to have zoomed in to a few months or smaller, not the whole time series.
+
+```{r}
+met %>%
+ filter(time >= "2013-05-28 00:00:00" & time <= "2013-09-03 00:00:00") %>%
+ ggplot() +
+  aes(x = time, y = AirTemp, colour = ShortWave) +
+  geom_line() +
+  scale_color_gradient(low = "#FFA6D2", high = "#84967C") +
+  labs(
+    x = "Time",
+    y = "Air Temperature (C)",
+    title = "Air Temperature v Time"
+  ) +
+  theme_minimal()
+```
+
+
 
 23. [A] **Scatterplot**
 * At the top left click on “Data” and change to the frog data “dat”
@@ -1292,9 +1373,45 @@ Once the tool launches use it to answer the following questions. Note that you w
 * Set labels, select plot options that provide a good color scheme, theme, etc
 * Export the code and describe the new functions and arguments being used.
 
+```{r}
+ggplot(dat) +
+  aes(x = tadpoles, y = frogs, colour = color, size = spots) +
+  geom_point(shape = "circle") +
+  scale_color_manual(
+    values = c(blue = "#8DCBFF",
+    red = "#FF6161")
+  ) +
+  labs(
+    x = "Tadpoles",
+    y = "Frogs",
+    title = "Frogs vs Tadpoles"
+  ) +
+  theme_minimal()
+```
+
+This new plot includes a description for color and size and all of the descriptions of that.
+
+
 24. [B] **Facet and group plots**
 * Drag spots from Size to Facet. This will cause ggplot to now draw separate plots for the spots=TRUE data and the spots=FALSE data. Export this plot code.
 * Similarly, if you change the plot to type ‘line’ in the top left and then drag spots from “Facet” to “Group” it will now draw separate lines for each case of spots. This feature can be particularly handy when you have data from many different discrete classes (states, plots, year, etc).
+
+```{r}
+ggplot(dat) +
+  aes(x = tadpoles, y = frogs, colour = color) +
+  geom_point(shape = "circle", size = 1.55) +
+  scale_color_manual(
+    values = c(blue = "#8DCBFF",
+    red = "#FF6161")
+  ) +
+  labs(
+    x = "Tadpoles",
+    y = "Frogs",
+    title = "Frogs vs Tadpoles"
+  ) +
+  theme_minimal() +
+  facet_wrap(vars(spots))
+```
 
 Hit the Close button on the ggplot2 builder and check to make sure that it put the code chunks in the right place with each question, that the R code is within executable R code blocks, and that the figures still render correctly when you hit ‘Knit’
 
@@ -1426,6 +1543,18 @@ plot(N)
 
 ## ★ Questions (25)
 25. [B] **Modify the logistic growth code to simulate discrete-time exponential growth and plot the output.**
+
+```{r}
+NT = 100  		## number of time steps
+N0 = 1				## initial population size
+r = 0.2				## population growth rate
+K = 10				## carrying capacity
+N = rep(N0,NT)
+for(t in 2:NT){
+	N[t] = N[t - 1] * (1 + r)
+}
+plot(N)
+```
 
 ## Matrix Math
 
