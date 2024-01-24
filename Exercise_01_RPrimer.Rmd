@@ -971,10 +971,39 @@ In this instance, when used alone both functions took the dataset as the first a
 ## ★ Questions (14)
 14.	**Using the frog data set and either base or dplyr functions:** 
 *  a.	[A] display just the rows where frogs have spots
+
+```{r}
+spots = dplyr::filter(dat, spots)
+head(spots)
+```
+
 *  b.	[B] display just the rows where frogs are blue
+
+```{r}
+color = dplyr::filter(dat, color == "blue")
+head(color)
+```
+
 *  c.	[A] create a new object containing just the rows where there are between 3 and 5 tadpoles
+
+```{r}
+tadpoles = dat |> filter(tadpoles > 3) |> filter(tadpoles < 5)
+head(tadpoles)
+```
+
 *  d.	[B] display just the rows where there are less than 2.5 red frogs
+
+```{r}
+frogs = dat |> filter(frogs < 2.5) |> filter(color == "red")
+head(frogs)
+```
+
 *  e.	[A] display where either frogs do not have spots or there are more than 5 frogs
+
+```{r}
+num14e = dat |> filter(spots == FALSE | frogs > 5)
+head(num14e)
+```
 
 # Summary tables and statistics
 
@@ -1115,7 +1144,15 @@ head(met)
 ## ★ Questions (15)
 15. 
   a. [A] **Use dplyr to calculate the daily mean air temperature**
+  
+```{r}
+met |>  summarise(avg = mean(AirTemp))
+```
+  
   b. [B] **Use apply to calculate the across-population standard deviations in the numbers of frogs and tadpoles**
+```{r}
+apply()  
+```
   
 
 # Plotting & visualization
