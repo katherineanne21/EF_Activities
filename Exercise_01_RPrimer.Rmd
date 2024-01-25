@@ -1551,7 +1551,7 @@ r = 0.2				## population growth rate
 K = 10				## carrying capacity
 N = rep(N0,NT)
 for(t in 2:NT){
-	N[t] = N[t - 1] * (1 + r)
+	N[t] = N0 * (r^t)
 }
 plot(N)
 ```
