@@ -36,6 +36,29 @@ plot(time,n,ylim=c(0,12),lwd=3,type='l',
 
 1. Generate plots of the logistic growth model at r = 1.95, 2.05, 2.5, and 2.8 Describe the trajectory observed in each case.
 
+```{r}
+dif_rs = c(1.95, 2.05, 2.5, 2.8)
+K = 10        ## carrying capacity      
+n0 = .1       ## initial population size
+NT = 30       ## number of time steps to simulate
+time = 1:NT
+
+for(r in dif_rs){
+  n = rep(n0,NT)    ## vector to store results
+  for(t in 2:NT){
+  n[t] = n[t-1] + r*n[t-1]*(1-n[t-1]/K)
+  }
+  
+  plot(time,n,ylim=c(0,12),lwd=3,type='l',
+     bty='l',cex.lab=1.5,
+     xlab="Time",ylab="Population Size")
+  
+  title(main = paste("Population Growth (r =", r, ")"))
+}
+
+```
+
+As R increases the graphs become more chaotic. For r = 1.95 you see a relatively stable end at 10. However, for r = 2.8, the end varies a lot more.
 
 Probability distributions in R
 ------------------------------
