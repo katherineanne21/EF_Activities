@@ -294,7 +294,18 @@ ciEnvelope <- function(x,ylo,yhi,col="lightgrey",...){
 
 4. [B] Plot histograms of the samples of r and K used for the simulation.
 
+```{r}
+hist(rE, main = "Histogram of r", xlab = "r", col = "pink")
+hist(KE, main = "Histogram of K", xlab = "K", col = "lightgreen")
+```
+
 5. [A] Plot a sample of 10 different trajectories (through time) from your ensemble (on one graph).
+
+```{r}
+
+
+
+```
 
 6. [B] Plot a histogram of your population forecast at time = 15.
 
