@@ -336,7 +336,7 @@ Extra Credit: Initial conditions
 The approach for simulating uncertainty in the initial conditions is very similar to the approach used for the parameter uncertainty.  As in Chapter 2, we'll assume that the initial condition is distributed as a lognormal to ensure that we never draw negative values. For this example we'll assume a standard deviation of 0.6 and an intrinsic growth rate of 0.3
 
 ```{r}
-r = 0.3
+initial_con <- function(r){
 n0.sd = 0.6
 n0s = rlnorm(NE,log(n0),n0.sd)
 n = matrix(n0s,NE,NT)
@@ -345,13 +345,35 @@ for(i in 1:NE){
     n[i,t] = max(0,n[i,t-1] + r*n[i,t-1]*(1-n[i,t-1]/K))
   }
 }
+}
+initial_con(0.3)
 ```
 
 ### Problems
 
 8. [B] Plot the median & 95% interval.
+```{r}
+plot_med_95 <- function(r, n, NT){
+  initial_con(r)
+  
+  plot(1:NT, apply(n, 2, median), type = "l", col = "darkred", 
+  ylim =  range(apply(n, 2, range)), main = 
+  paste("Initial Conditions (r =", r, ")"), xlab = "time", ylab = "n")
+  
+  n.stats = apply(n,2,quantile,c(0.025,0.5,0.975))
+
+  ciEnvelope(1:NT, n.stats[1, ], n.stats[3, ], col = rgb(1, 0.6, 0.8, 
+                                                         alpha = 0.25))
+}
+
+plot_med_95(0.3, n, NT)
+```
 
 9. [C] Repeat with r equal to 1.95, 2.05, and 2.8
-
+```{r}
+for(r in c(1.95,2.05,2.8)){
+  plot_med_95(r, n, NT)
+}
+```
 
 
