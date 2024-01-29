@@ -302,18 +302,31 @@ hist(KE, main = "Histogram of K", xlab = "K", col = "lightgreen")
 5. [A] Plot a sample of 10 different trajectories (through time) from your ensemble (on one graph).
 
 ```{r}
-matplot(1:NT, t(n[1:10, ]), type = "l", col = "darkblue", ylim = range(c(n, n.stats)), xlab = "Time", ylab = "Population Size", main = "Sample Trajectories")
+## Using a for loop
+plot(1:NT, n[1, ], col = 1, type = "l", ylim = range(apply(n, 2, range)), main = "Sample Trajectories", xlab = "time", ylab = "n")
+
+for(x in 1:10){
+  lines(1:NT, n[x,], type = "l", col = x, ylim = range(apply(n, 2, range)))
+}
+
+## Online Help Solution
+matplot(1:NT, t(n[1:10, ]), type = "l", col = "darkblue", ylim = range(apply(n, 2, range)), main = "Sample Trajectories", xlab = "time", ylab = "n")
 ```
 
 6. [B] Plot a histogram of your population forecast at time = 15.
 
 ```{r}
-?matplot
+hist(n[, 15], col = "darkorchid", main = "Histogram forecase at t = 15", xlab = "n")
 ```
 
 7. [A] Plot the median trajectory through time. Use `ciEnvelope` to add a 95% CI (i.e. 2.5% to 97.5%) to the plot. This function need to take time-series for both the upper (yhi) and lower (ylo) intervals.
 
 ```{r}
+
+plot(1:NT, apply(n, 2, median), type = "l", col = "darkred", 
+  ylim =  range(apply(n, 2, range)), main = "Sample Trajectories", xlab = "time", ylab = "n")
+
+ciEnvelope(1:NT, n.stats[1, ], n.stats[3, ], col = rgb(1, 0.6, 0.8, alpha = 0.25))
 
 ```
 
