@@ -167,15 +167,29 @@ This example demonstrates that as the number of random draws from a probability 
 2. [A] Choose another probability distribution from the table above and generate graphs of the probability density function, the cumulative distribution function, the quantile function, and a histogram of samples from that distribution.
 
 ```{r}
+?qpois
+```
+
+```{r}
 ## PDF Function
 
-x = seq(-5,5)
-plot(x,dpois(x,lambda = 2),type='l')  		## that’s a lowercase “L” for “line”
-abline(v=0)				          	## add a line to indicate the mean (“v” is for “vertical”)
-lines(x,dpois(x,lambda = 2),col=2)			## try changing the mean (“col” sets the color)
-abline(v=2,col=2)
-lines(x,dpois(x,lambda = 2),col=3)	## try changing the mean and standard dev
-abline(v=-1,col=4)
+x = seq(-25,50,by = 2)
+plot(x,dpois(x,lambda = 5),type='l') 
+
+## CDF Function
+plot(x,ppois(x,lambda = 5),type='l')
+
+## Quantile
+plot(x,qpois(x,lambda = 5),type='l',ylim=range(x))
+
+## Histogram samples
+n = c(10,100,1000,10000)	# sequence of sample sizes
+for(i in 1:4){			# loop over these sample sizes
+  hist(rpois(n[i], lambda = 5),main=n[i],probability=TRUE,breaks=40)  
+				#here breaks defines number of bins in the histogram
+  lines(x,dpois(x, lambda = 5),col=2)
+}
+
 ```
 
 
