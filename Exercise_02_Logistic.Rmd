@@ -173,21 +173,22 @@ This example demonstrates that as the number of random draws from a probability 
 ```{r}
 ## PDF Function
 
-x = seq(-25,50,by = 2)
-plot(x,dpois(x,lambda = 5),type='l') 
+x = seq(-25,50,by = 1)
+plot(x,dpois(x,lambda = 5),type='s') 
 
 ## CDF Function
-plot(x,ppois(x,lambda = 5),type='l')
+plot(x,ppois(x,lambda = 5),type='s')
 
 ## Quantile
-plot(x,qpois(x,lambda = 5),type='l',ylim=range(x))
+p = seq(0,1,by=0.01)
+plot(p,qpois(p,lambda = 5),type='l')
 
 ## Histogram samples
 n = c(10,100,1000,10000)	# sequence of sample sizes
 for(i in 1:4){			# loop over these sample sizes
-  hist(rpois(n[i], lambda = 5),main=n[i],probability=TRUE,breaks=40)  
+  hist(rpois(n[i], lambda = 5),main=n[i],probability=TRUE,breaks=x)  
 				#here breaks defines number of bins in the histogram
-  lines(x,dpois(x, lambda = 5),col=2)
+  lines(x-1,dpois(x, lambda = 5),col=2, type='s')
 }
 
 ```
@@ -224,6 +225,19 @@ It turns out that this specific transformation (x^2 of a standard Normal), has a
 ### Problems
 
 3. [B] Numerically transform a lognormal(meanlog=0,sdlog=0.5) through sin(x) using Monte Carlo simulation. Include histograms of the original and transformed distributions. Report the mean, median, and 95% CI for both distributions and indicate these values on the histograms.
+
+```{r}
+x = rnorm(10000,0,1)
+y = x^2
+
+hist(x,main="Original distribution",breaks=40)
+abline(v=quantile(x,c(0.025,0.5,0.975)),lty=c(2,1,2),lwd=3,col="orange")
+abline(v=mean(x),col="red",lwd=3,lty=3)
+
+hist(y,main="Transformed distribution",breaks=40)
+abline(v=quantile(y,c(0.025,0.5,0.975)),lty=c(2,1,2),lwd=3,col="orange")
+abline(v=mean(y),col="red",lwd=3,lty=3)
+```
 
 Parameter error
 ---------------
