@@ -239,6 +239,13 @@ abline(v=quantile(y,c(0.025,0.5,0.975)),lty=c(2,1,2),lwd=3,col="orange")
 abline(v=mean(y),col="red",lwd=3,lty=3)
 
 print(paste("Mean of x: ", as.character(mean(x))))
+print(paste("Median of x: ", as.character(median(x))))
+print(paste("95% CI of x: ", as.character(quantile(x,.95))))
+
+print(paste("Mean of y: ", as.character(mean(y))))
+print(paste("Median of y: ", as.character(median(y))))
+print(paste("95% CI of y: ", as.character(quantile(y,.95))))
+
 ```
 
 Parameter error
