@@ -987,8 +987,8 @@ head(color)
 *  c.	[A] create a new object containing just the rows where there are between 3 and 5 tadpoles
 
 ```{r}
-tadpoles = dat |> filter(tadpoles > 3) |> filter(tadpoles < 5)
-head(tadpoles)
+tadpole = dat |> filter(tadpoles > 3) |> filter(tadpoles < 5)
+head(tadpole)
 ```
 
 *  d.	[B] display just the rows where there are less than 2.5 red frogs
