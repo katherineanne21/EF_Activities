@@ -345,8 +345,9 @@ for(i in 1:NE){
     n[i,t] = max(0,n[i,t-1] + r*n[i,t-1]*(1-n[i,t-1]/K))
   }
 }
+invisible(n)
 }
-initial_con(0.3)
+n = initial_con(0.3)
 ```
 
 ### Problems
@@ -354,7 +355,7 @@ initial_con(0.3)
 8. [B] Plot the median & 95% interval.
 ```{r}
 plot_med_95 <- function(r, n, NT){
-  initial_con(r)
+  n = initial_con(r)
   
   plot(1:NT, apply(n, 2, median), type = "l", col = "darkred", 
   ylim =  range(apply(n, 2, range)), main = 
