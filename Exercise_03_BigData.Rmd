@@ -66,6 +66,12 @@ For more information, please visit http://www.google.org/flutrends
 
 Make a simple time-series plot of the Harvard Forest (HARV) Phenocam phenology data (gcc_90), which EFI has preprocessed and saved here https://data.ecoforecast.org/neon4cast-targets/phenology/phenology-targets.csv.gz as part of the NEON forecasting challenge.  
 
+```{r}
+phenocam = readr::read_csv("https://data.ecoforecast.org/neon4cast-targets/phenology/phenology-targets.csv.gz",skip = 11)
+time = as.Date(phenocam$Date)
+plot(phenocam$Date, phenocam, type='l')
+```
+
 grep, system, RegExp
 --------------------
 
@@ -137,6 +143,11 @@ gsub("HARV","BART",myCode[x])  ## substitute ALL: HARV for BART
 
 **Question 2: [B]** Within the object myCode, find all the lines that begin with the comment character, #.
 
+```{r}
+comment_lines = grep("^#", myCode)
+comment_lines
+```
+
 Using APIs
 ----------
 
@@ -186,6 +197,10 @@ time = as.Date(names(EVI))
 ```
 
 **Question 3: [B]** Plot EVI versus time and compare to the NEON phenocam observations.
+
+```{r}
+plot(time, EVI, type = "l")
+```
 
 FYI, APIs now exist for an enormous range of data sources that are available on the web, as well as a range of web-services that allow you to not just download data but to also upload data or push requests various cloud platforms.
 
