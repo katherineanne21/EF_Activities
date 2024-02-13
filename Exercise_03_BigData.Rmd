@@ -199,9 +199,7 @@ time = as.Date(names(EVI))
 **Question 3:** Plot EVI versus time and compare to the NEON phenocam observations.
 
 ```{r}
-
-
-
+plot(time, EVI, type = "l")
 ```
 
 
