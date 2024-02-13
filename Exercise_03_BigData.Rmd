@@ -142,6 +142,12 @@ gsub("HARV","BART",myCode[x])  ## substitute ALL: HARV for BART
 
 **Question 2:** Within the object myCode, find all the lines that begin with the comment character, #.
 
+```{r}
+comment_lines = grep("^#", myCode)
+comment_lines
+```
+
+
 Using APIs
 ----------
 
@@ -191,6 +197,13 @@ time = as.Date(names(EVI))
 ```
 
 **Question 3:** Plot EVI versus time and compare to the NEON phenocam observations.
+
+```{r}
+
+
+
+```
+
 
 FYI, APIs now exist for an enormous range of data sources that are available on the web, as well as a range of web-services that allow you to not just download data but to also upload data or push requests various cloud platforms.
 
