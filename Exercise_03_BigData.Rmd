@@ -68,7 +68,8 @@ Make a simple time-series plot of the Harvard Forest (HARV) Phenocam phenology d
 
 ```{r}
 phenocam = readr::read_csv("https://data.ecoforecast.org/neon4cast-targets/phenology/phenology-targets.csv.gz")
-plot(phenocam$datetime, phenocam$observation, type='p', cex = .1, xlab = "Year", ylab = "GCC 90", main = "Phenocam Phonology Data")
+phenocam_harvard = dplyr::filter(phenocam, site_id == "HARV")
+plot(phenocam_harvard$datetime, phenocam_harvard$observation, type='l', xlab = "Year", ylab = "GCC 90", main = "Phenocam Phonology Data")
 ```
 
 grep, system, RegExp
