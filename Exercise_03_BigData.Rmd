@@ -348,6 +348,10 @@ def_2 = species_2$attributeDefinition
 units_1 = species_1$unit
 units_2 = species_2$unit
 
+forecast = eml_get(md$additionalMetadata, "forecast")
+process_error = forecast$process_error
+process_error_status = process_error$status
+
 # Help from Sebastian
 # attributes_spec = subset(attributes_df, attributeName = c("species_1", "species_2"))
 ```
@@ -423,4 +427,4 @@ Imagine you are working with MODIS data, but are grabbing a large region (rather
 
 * Write out what the cron table would look like to schedule this job (assume the update only needs to be done weekly)
 
-
+0 10 * * 0 /path/script.sh
