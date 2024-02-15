@@ -275,18 +275,22 @@ s3 <- arrow::s3_bucket(bucket = "neon4cast-drivers/noaa/gefs-v12/stage2/parquet/
                        anonymous=TRUE)
 ds <- arrow::open_dataset(s3)
 
-ds
-df <- ds |> 
-  filter(model_id == "climatology",
-         variable=="gcc_90",
-         site_id == "HARV") |>
-  collect()
+dataframe <- ds |> filter(site_id == "HARV", variable == "air_temperature") |> collect()
 
 save(df,file="NOAA_GEFS.Rdata")
 } ## end download
 
-```
+head(dataframe)
 
+plot(dataframe$datetime, dataframe$prediction, type = "n", xlab = "Date", ylab = "Air Temperature",
+     main = "Timeseries of Air Temperature")
+index = unique(dataframe$parameter)
+
+for(i in index){
+  new_df = filter(dataframe, parameter == i)
+  lines(new_df$datetime, new_df$prediction, col = rainbow(length(index))[i], type = 'l')
+}
+```
 
 
 EML Metadata
@@ -297,6 +301,9 @@ Data is usually only as the valuable as the meta-data associated with it. While 
 A particularly common metadata standard in ecology is the Ecological Metadata Language (EML). This is also the standard that the Ecological Forecasting Initative built upon when developing a community standard for documenting forecasts outputs (yes, forecasts need metadata too!). In the example below we explore the structure and content of the metadata for a simple forecast.
 
 ```{r}
+install.packages("EML")
+library(EML)
+
 ## load example metadata from the EFI standard github repo
 md <- read_eml("https://raw.githubusercontent.com/eco4cast/EFIstandards/master/inst/extdata/forecast-eml.xml")
 ```
@@ -328,6 +335,24 @@ More information about the EFI metadata standard can be found here https://githu
 
 **Question 5 [A]**
 Based on the metadata above, what were the identities of the species_1 and species_2 columns in the forecast file, what units were used, and did this forecast propagate the initial condition uncertainty for these species? For full credit, include code that answers these questions rather than just looking for the answers in the output.
+
+```{r}
+attributes = get_attributes(dt_md$dataTable$attributeList)
+attributes_df = attributes$attributes
+
+species_1 <- attributes_df[attributes_df$attributeName == "species_1", ]
+species_2 <- attributes_df[attributes_df$attributeName == "species_2", ]
+
+def_1 = species_1$attributeDefinition
+def_2 = species_2$attributeDefinition
+
+units_1 = species_1$unit
+units_2 = species_2$unit
+
+# Help from Sebastian
+# attributes_spec = subset(attributes_df, attributeName = c("species_1", "species_2"))
+```
+
 
 cron
 ----
@@ -385,7 +410,7 @@ cron_rm("test2")
 
 **Question #6: [A]**
 
-Imagine you are working with MODIS data, but are grabbing a large region (rather than a single pixel) and want to ensure that the data you are using is alwaysd up to date. However, the total size of the database is large and you don't want to completely delete and reinstall the database every day when only a small percentage of the data changes in any update. 
+Imagine you are working with MODIS data, but are grabbing a large region (rather than a single pixel) and want to ensure that the data you are using is always up to date. However, the total size of the database is large and you don't want to completely delete and reinstall the database every day when only a small percentage of the data changes in any update. 
 
 * Write out the pseudocode/outline for how to keep the files up to date
 * Write out what the cron table would look like to schedule this job (assume the update only needs to be done weekly)
