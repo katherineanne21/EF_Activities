@@ -280,7 +280,6 @@ dataframe <- ds |> filter(site_id == "HARV", variable == "air_temperature") |> c
 save(df,file="NOAA_GEFS.Rdata")
 } ## end download
 
-head(dataframe)
 
 plot(dataframe$datetime, dataframe$prediction, type = "n", xlab = "Date", ylab = "Air Temperature",
      main = "Timeseries of Air Temperature")
@@ -413,6 +412,15 @@ cron_rm("test2")
 Imagine you are working with MODIS data, but are grabbing a large region (rather than a single pixel) and want to ensure that the data you are using is always up to date. However, the total size of the database is large and you don't want to completely delete and reinstall the database every day when only a small percentage of the data changes in any update. 
 
 * Write out the pseudocode/outline for how to keep the files up to date
+
+# Check current timestamp of data loaded
+
+# Check metadata of each pixel to see if the temporal coverage ends after the current date
+
+# Download pixels that are new
+
+# Update a working variable of the current timestamp for data loaded
+
 * Write out what the cron table would look like to schedule this job (assume the update only needs to be done weekly)
 
 
