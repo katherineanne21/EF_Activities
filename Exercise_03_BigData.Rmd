@@ -300,9 +300,6 @@ Data is usually only as the valuable as the meta-data associated with it. While 
 A particularly common metadata standard in ecology is the Ecological Metadata Language (EML). This is also the standard that the Ecological Forecasting Initative built upon when developing a community standard for documenting forecasts outputs (yes, forecasts need metadata too!). In the example below we explore the structure and content of the metadata for a simple forecast.
 
 ```{r}
-install.packages("EML")
-library(EML)
-
 ## load example metadata from the EFI standard github repo
 md <- read_eml("https://raw.githubusercontent.com/eco4cast/EFIstandards/master/inst/extdata/forecast-eml.xml")
 ```
