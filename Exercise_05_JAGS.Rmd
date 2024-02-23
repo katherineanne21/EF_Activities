@@ -197,6 +197,10 @@ data$s1 <- 0.1                    ## error prior n/2
 data$s2 <- 0.1                    ## error prior SS/2
 ```
 
+# Task 2 Hint
+data$b0 <- as.vector(c(0,0,0,0))      ## regression b means
+data$Vb <- solve(diag(10000,4))   ## regression b precisions
+
 **Note: If you want to fit a regression with more covariates (and thus more bs), you will need to increase the *size* of `b0` and `Vb` to match the number of bs.**
 
 In this example I demonstrated converting from standard deviation to precision because, at least initially, most people are not accustomed to thinking in terms of precisions. The exact numeric values used for the data and priors are not important here and are just for illustration---how priors are chosen is discussed elsewhere.
