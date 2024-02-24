@@ -380,11 +380,25 @@ summary(SD)
 -   Evaluate the MCMC chain for convergence. Include relevant diagnostics and plots. Determine and remove burn-in [A]
 
 ```{r}
+# Visually look at where the data converges
+BGR <- gelman.plot(jags.out)
 
-
+# Remove burn in
+burnin = 500                                   
+jags.burn <- window(jags.out, start = burnin)  
+plot(jags.burn)
 ```
 
 -   Report parameter summary table and plot marginal distributions [A]
+
+```{r}
+# Parameter Table
+summary(jags.burn)
+
+# Marginal Distribution Plot
+densplot(jags.burn, main = "Marginal Distributions of Parameters")
+```
+
 -   Describe and explain the parameter covariances that you observe in the pairs plot and parameter correlation matrix.[B]
 -   Compare the summary statistics for the Bayesian regression model to those from the classical regression: `summary(lm(y ~ x1))`. This should include a comparison of the means and uncertainties of **all 3 model parameters** [A]
 
@@ -393,6 +407,43 @@ summary(SD)
 Using the dataset "data/Ex05.Part2.RData", extend your univariate regression to a multiple regression model with two covariates (x1, x2) and an interaction term (x1\*x2). In doing so, not only do you need to update your process model, but you also need to make sure to update the dimension of your prior and initial conditions on $b$ from 2 to 4.
 
 ### Task 2
+
+```{r}
+# Load and create a list of the data
+load("data/Ex05.Part1.RData")
+data2 <- list(x = x1, y = y, n = length(y))
+
+# Set up new data columns (different from task 1)
+data2$b0 <- as.vector(c(0,0,0,0))  ## regression b means
+data2$Vb <- solve(diag(10000,4))   ## regression b precisions
+data2$s1 <- 0.1                    ## error prior n/2
+data2$s2 <- 0.1                    ## error prior SS/2
+
+# Initial Conditions
+inits2 = list(S=1/var(y))
+inits2 <- list()
+inits2[[1]] <- list(S = 1/200)
+inits2[[2]] <- list(S = 1/70)
+inits2[[3]] <- list(S = 1/20)
+
+nchain = 3
+inits2 <- list()
+for(i in 1:nchain){
+ inits2[[i]] <- list(b = rnorm(2,0,5), S = runif(1,1/200,1/20))
+}
+
+# Set Up JAGS
+j.model2 <- jags.model(file = textConnection(univariate_regression),
+                      data = data2,
+                      inits = inits2,
+                      n.chains = 3)
+
+jags.out2 <- coda.samples(model = j.model2,
+                         variable.names = c("b","S"),
+                         n.iter = 5000)
+
+```
+
 
 -   Show the JAGS and R code used. [A]
 -   Include relevant convergence diagnostics and plots. [A]
