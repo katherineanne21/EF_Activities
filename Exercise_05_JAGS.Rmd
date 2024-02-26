@@ -442,6 +442,20 @@ jags.out2 <- coda.samples(model = j.model2,
                          variable.names = c("b","S"),
                          n.iter = 5000)
 
+# Visually look at where the data converges
+BGR <- gelman.plot(jags.out)
+
+# Remove burn in
+burnin = 500                                   
+jags.burn <- window(jags.out, start = burnin)  
+plot(jags.burn)
+
+# Parameter Table
+summary(jags.burn)
+
+# Marginal Distribution Plot
+densplot(jags.burn, main = "Marginal Distributions of Parameters")
+
 ```
 
 
