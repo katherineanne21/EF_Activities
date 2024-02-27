@@ -397,10 +397,16 @@ summary(jags.burn)
 
 # Marginal Distribution Plot
 densplot(jags.burn, main = "Marginal Distributions of Parameters")
+
+# Effective Sample Size
+effective_size = effectiveSize(jags.burn)
+effective_size
 ```
 
 -   Describe and explain the parameter covariances that you observe in the pairs plot and parameter correlation matrix.[B]
 -   Compare the summary statistics for the Bayesian regression model to those from the classical regression: `summary(lm(y ~ x1))`. This should include a comparison of the means and uncertainties of **all 3 model parameters** [A]
+
+In this case, they're all the same. The more data you have and the weaker your priors are the more likely they are to be the same. (Monday lecture)
 
 # Multiple Regression
 
@@ -429,7 +435,7 @@ inits2[[3]] <- list(S = 1/20)
 nchain = 3
 inits2 <- list()
 for(i in 1:nchain){
- inits2[[i]] <- list(b = rnorm(2,0,5), S = runif(1,1/200,1/20))
+ inits2[[i]] <- list(b = rnorm(4,0,5), S = runif(1,1/200,1/20))
 }
 
 # Set Up JAGS
@@ -443,18 +449,27 @@ jags.out2 <- coda.samples(model = j.model2,
                          n.iter = 5000)
 
 # Visually look at where the data converges
-BGR <- gelman.plot(jags.out)
+BGR <- gelman.plot(jags.out2)
 
 # Remove burn in
 burnin = 500                                   
-jags.burn <- window(jags.out, start = burnin)  
-plot(jags.burn)
+jags.burn2 <- window(jags.out2, start = burnin)  
+plot(jags.burn2)
 
 # Parameter Table
-summary(jags.burn)
+summary(jags.burn2)
 
 # Marginal Distribution Plot
-densplot(jags.burn, main = "Marginal Distributions of Parameters")
+densplot(jags.burn2, main = "Marginal Distributions of Parameters")
+
+# Pairwise Parameter Correlations
+out <- as.matrix(jags.burn2)
+pairs(out)	
+cor(out)
+
+# Effective Sample Size
+effective_size2 = effectiveSize(jags.burn2)
+effective_size2
 
 ```
 
