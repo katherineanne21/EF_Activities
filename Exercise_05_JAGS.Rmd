@@ -398,12 +398,20 @@ summary(jags.burn)
 # Marginal Distribution Plot
 densplot(jags.burn, main = "Marginal Distributions of Parameters")
 
+# Pairwise Parameter Correlations
+out <- as.matrix(jags.burn)
+pairs(out)	
+cor(out)
+
 # Effective Sample Size
-effective_size = effectiveSize(jags.burn)
-effective_size
+effective_size2 = effectiveSize(jags.burn)
+effective_size2
 ```
 
 -   Describe and explain the parameter covariances that you observe in the pairs plot and parameter correlation matrix.[B]
+
+Based on the Pairwise Parameter Correlation Plots, b1 and b2 are relatively correlated. As seen in the summary table, they have a correlation of roughly -0.88.
+
 -   Compare the summary statistics for the Bayesian regression model to those from the classical regression: `summary(lm(y ~ x1))`. This should include a comparison of the means and uncertainties of **all 3 model parameters** [A]
 
 In this case, they're all the same. The more data you have and the weaker your priors are the more likely they are to be the same. (Monday lecture)
