@@ -193,14 +193,17 @@ Question 2 [C: Extra Credit]
 To look at how observation frequency affects data assimilation, convert 3 out of every 4 observations to NA (i.e. treat the data as approximately monthly) and refit the model. 
 
 ```{r}
-gflu_new = gflu
-NA_vector = rep(NA, nrow(gflu))
-indices_to_convert <- seq(1, length(gflu), by = 4)
-gflu_new$Massachusetts <- NA_vector
-gflu_new$Massachusetts[indices_to_convert] <- gflu[indices_to_convert, "Massachusetts"]
-y_new = gflu_new$Massachusetts
+NA_vector = rep(NA, nrow(gflu)) # create a vector of NA's as a base
+indices_to_convert <- seq(1, nrow(gflu), by = 4) # select all rows that you wnat to keep the values for
 
-print(y_new)
+for(i in indices_to_convert){
+  
+  # Change the value from NA to the number we wanted to keep
+  NA_vector[i] <- gflu[i, "Massachusetts"] 
+}
+
+# Set y_new as this new vector with 3/4 NA
+y_new = NA_vector
 
 # Fit the model again
 data_new <- list(y=log(y_new),n=length(y_new),      ## data
@@ -244,6 +247,9 @@ legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("
 
 * Generate a time-series plot for the CI of x that includes the observations (as above). Use a different color and symbol to differentiate observations that were included in the model versus those that were converted to NA's.
 * Compare the CI between the two runs.
+
+The CI for this second run was mush better. While the CI was wider at all points, none of the points went outside the CI. Additionaly, the end didn't have a massive spread of what the values could be.
+
 * Generate a predicted (median) vs observed plot for the data points that were removed
 * Comment on the accuracy and precision of the state estimates.
 * How does the reduction in data volume affect the parameter estimates (taus)
