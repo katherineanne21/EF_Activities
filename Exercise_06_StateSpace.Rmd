@@ -127,18 +127,120 @@ cor(out[,1:2])
 ```
 
 
-Assignment:
+Question 1 [A]:
 -----------
 
 To explore the ability of state space models to generate forecasts (or in this case, a hindcast) make a copy of the data and **remove the last 40 observations (convert to NA)** and refit the model.
 
+```{r}
+# Change the last 40 observations to NA
+gflu_new = gflu
+gflu_new[580:620,] = NA
+y_new = gflu_new$Massachusetts
+
+
+
+# Fit the model again
+data_new <- list(y=log(y_new),n=length(y_new),      ## data
+             x_ic=log(1000),tau_ic=100, ## initial condition prior
+             a_obs=1,r_obs=1,           ## obs error prior
+             a_add=1,r_add=1            ## process error prior
+             )
+
+nchain = 3
+init_new <- list()
+for(i in 1:nchain){
+  y.samp = sample(y_new,length(y_new),replace=TRUE)
+  init_new[[i]] <- list(tau_add=1/var(diff(log(y.samp))),  ## initial guess on process precision
+                    tau_obs=5/var(log(y.samp)))        ## initial guess on obs precision
+}
+
+j.model   <- jags.model (file = textConnection(RandomWalk),
+                             data = data_new,
+                             inits = init_new,
+                             n.chains = 3)
+
+jags.out   <- coda.samples (model = j.model,
+                            variable.names = c("x","tau_add","tau_obs"),
+                                n.iter = 10000)
+
+# Visualize
+time.rng = c(length(time)-80,length(time))       ## adjust to zoom in and out
+out <- as.matrix(jags.out)         ## convert from coda to matrix  
+x.cols <- grep("^x",colnames(out)) ## grab all columns that start with the letter x
+ci <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
+
+plot(time,ci[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
+
+ecoforecastR::ciEnvelope(time,ci[1,],ci[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+points(time,y,cex=0.5, pch="+", col = 'red') # original points turned into NA
+points(time,y_new,pch="+",cex=0.5)
+
+legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("red", "black"), cex = 1)
+
+```
+
+
 * Generate a time-series plot for the CI of x that includes all the original observed data (as above but zoom the plot on the last ~80 observations). Use a different color and symbol to differentiate observations that were included in the model versus those that were converted to NA's.
 * Comment on how well the random walk model performed (both accuracy and precision) and how it might be modified to improve both these criteria.
 
+Most of the data points stayed inside of the confidence interval, but not all of them. This means the model was not accurate. Additionaly, the confidence interval was very large so it wasn't very precise. This can be improved by...
 
-Extra Credit (Part 1):
+
+
+Question 2 [C: Extra Credit]
 ----------------------
 To look at how observation frequency affects data assimilation, convert 3 out of every 4 observations to NA (i.e. treat the data as approximately monthly) and refit the model. 
+
+```{r}
+gflu_new = gflu
+NA_vector = rep(NA, nrow(gflu))
+indices_to_convert <- seq(1, length(gflu), by = 4)
+gflu_new$Massachusetts <- NA_vector
+gflu_new$Massachusetts[indices_to_convert] <- gflu[indices_to_convert, "Massachusetts"]
+y_new = gflu_new$Massachusetts
+
+print(y_new)
+
+# Fit the model again
+data_new <- list(y=log(y_new),n=length(y_new),      ## data
+             x_ic=log(1000),tau_ic=100, ## initial condition prior
+             a_obs=1,r_obs=1,           ## obs error prior
+             a_add=1,r_add=1            ## process error prior
+             )
+
+nchain = 3
+init_new <- list()
+for(i in 1:nchain){
+  y.samp = sample(y_new,length(y_new),replace=TRUE)
+  init_new[[i]] <- list(tau_add=1/var(diff(log(y.samp))),  ## initial guess on process precision
+                    tau_obs=5/var(log(y.samp)))        ## initial guess on obs precision
+}
+
+j.model   <- jags.model (file = textConnection(RandomWalk),
+                             data = data_new,
+                             inits = init_new,
+                             n.chains = 3)
+
+jags.out   <- coda.samples (model = j.model,
+                            variable.names = c("x","tau_add","tau_obs"),
+                                n.iter = 10000)
+
+# Visualize
+time.rng = c(length(time)-80,length(time))       ## adjust to zoom in and out
+out <- as.matrix(jags.out)         ## convert from coda to matrix  
+x.cols <- grep("^x",colnames(out)) ## grab all columns that start with the letter x
+ci <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
+
+plot(time,ci[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
+
+ecoforecastR::ciEnvelope(time,ci[1,],ci[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+points(time,y,cex=0.5, pch="+", col = 'red') # original points turned into NA
+points(time,y_new,pch="+",cex=0.5)
+
+legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("red", "black"), cex = 1)
+
+```
 
 * Generate a time-series plot for the CI of x that includes the observations (as above). Use a different color and symbol to differentiate observations that were included in the model versus those that were converted to NA's.
 * Compare the CI between the two runs.
@@ -208,14 +310,15 @@ This code illustrates a few things:
 
 Finally, the returned object also includes the `data` that was used to fit the model.
 
-Part 2:
+Question 3 [A]:
 -----------
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
-* Because a state-space model returns X's that are close to the Y's, metrics such as R2 and RMSE aren't great metrics of model performance. Besides looking at the taus, how else could we judge which model is doing better (in a way that avoids/penalizes overfitting)?
 * Explain and discuss the parameter estimates (betas) from the dynamic linear model (what do they mean both biologically and in terms of the predictability of the system) and their correlations
+* Because a state-space model returns X's that are close to the Y's, metrics such as R2 and RMSE aren't great metrics of model performance. Besides looking at the taus, how else could we judge which model is doing better (in a way that avoids/penalizes overfitting)?
 
-Part 3:
+
+Question 4 [B]:
 -----------
 
 Repeat the process of forecasting the last 40 observations (convert to NA), this time using the DLM with temperature as a covariate
@@ -225,7 +328,7 @@ Repeat the process of forecasting the last 40 observations (convert to NA), this
 
 # Next steps 
 
-Apply these modeling approaches to you own time-series data! As a simple place to start note that you can fit the basic Random Walk model using `fit_dlm` just by setting `fixed = ""`. Also, as with standard `lm` syntax, you can suppress the intercept by including -1 in fixed, specify interaction terms using multiplication (e.g. X * Tmin), and express polynomials both on X and on covariates (e.g. X^2 or Tmin^2). The latter allows you to construct models with stabalizing feedbacks, for example:
+Apply these modeling approaches to you own time-series data! As a simple place to start note that you can fit the basic Random Walk model using `fit_dlm` just by setting `fixed = ""`. Also, as with standard `lm` syntax, you can suppress the intercept by including -1 in fixed, specify interaction terms using multiplication (e.g. X * Tmin), and express polynomials both on X and on covariates (e.g. X^2 or Tmin^2). The latter allows you to construct models with stabilizing feedbacks, for example:
 
 $$ N_{t+1} = N_t + rN_t \left( 1 + {{N_t}\over{K}} \right) = (1+r)N_t + {{r}\over{K}}N_t^2$$
 can be expressed as fixed = "-1 + X + X^2" where $\beta_X = r$ and $\beta_{X^2} = r/K$.
