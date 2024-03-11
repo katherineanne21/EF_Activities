@@ -194,7 +194,7 @@ To look at how observation frequency affects data assimilation, convert 3 out of
 
 ```{r}
 NA_vector = rep(NA, nrow(gflu)) # create a vector of NA's as a base
-indices_to_convert <- seq(1, nrow(gflu), by = 4) # select all rows that you wnat to keep the values for
+indices_to_convert <- seq(1, nrow(gflu), by = 4) # select all rows that you want to keep the values for
 
 for(i in indices_to_convert){
   
