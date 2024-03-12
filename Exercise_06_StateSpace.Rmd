@@ -251,8 +251,17 @@ legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("
 The CI for this second run was mush better. While the CI was wider at all points, none of the points went outside the CI. Additionaly, the end didn't have a massive spread of what the values could be.
 
 * Generate a predicted (median) vs observed plot for the data points that were removed
+
+Help!!
+
 * Comment on the accuracy and precision of the state estimates.
+
+This is when the line of the predicted (median) vs observed plot is a 1:1 line correct? And so if it deviates from that it would be not very accurate? but if all of the points deviate at the same place it would be precise?
+
 * How does the reduction in data volume affect the parameter estimates (taus)
+
+How do I find the taus?
+
 
 # Dynamic Linear Models
 
@@ -320,8 +329,17 @@ Question 3 [A]:
 -----------
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
+
+Where do I find this?
+
 * Explain and discuss the parameter estimates (betas) from the dynamic linear model (what do they mean both biologically and in terms of the predictability of the system) and their correlations
+
+beta_0 is the intercept, beta_1 is the slope of the covariate effect, and beta_X is the slope of the initial condition effect
+
 * Because a state-space model returns X's that are close to the Y's, metrics such as R2 and RMSE aren't great metrics of model performance. Besides looking at the taus, how else could we judge which model is doing better (in a way that avoids/penalizes overfitting)?
+
+A K-fold cross-validation?
+
 
 
 Question 4 [B]:
@@ -330,6 +348,18 @@ Question 4 [B]:
 Repeat the process of forecasting the last 40 observations (convert to NA), this time using the DLM with temperature as a covariate
 
 * Generate a time-series plot for the CI that includes the observations and both the random walk and DLM models (Hint, think about the order you plot in so you can see both models, also consider including transpancy [alpha] in the CI color)
+
+```{r}
+
+# Question 3 Plot
+out <- as.matrix(ef.out$predict)
+ci <- apply(exp(out),2,quantile,c(0.025,0.5,0.975))
+plot(time,ci[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
+ecoforecastR::ciEnvelope(time,ci[1,],ci[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+points(time,y,pch="+",cex=0.5)
+```
+
+
 * Comment on how well the DLM model performed (both accuracy and precision) relative to the random walk and the true observations. How could the model be further improved?
 
 # Next steps 
