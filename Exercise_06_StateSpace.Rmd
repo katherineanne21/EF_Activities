@@ -350,7 +350,7 @@ A positive correlation between beta_1 and beta_X indicates that Tmin also impact
 
 * Because a state-space model returns X's that are close to the Y's, metrics such as R2 and RMSE aren't great metrics of model performance. Besides looking at the taus, how else could we judge which model is doing better (in a way that avoids/penalizes overfitting)?
 
-A K-fold cross-validation?
+One method is the K-fold cross-validation. I would assume it to be best to choose the blocks randomly as to not input your personal bias. K-fold cross-validation uses different test groups to see if the model is effective. You divide your data into groups and use 1 group as the test group and the rest for fitting. This is repeated for all groups and then the variations are averaged and discussed.
 
 
 
