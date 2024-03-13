@@ -138,8 +138,6 @@ gflu_new = gflu
 gflu_new[580:620,] = NA
 y_new = gflu_new$Massachusetts
 
-
-
 # Fit the model again
 data_new <- list(y=log(y_new),n=length(y_new),      ## data
              x_ic=log(1000),tau_ic=100, ## initial condition prior
@@ -170,6 +168,11 @@ out <- as.matrix(jags.out)         ## convert from coda to matrix
 x.cols <- grep("^x",colnames(out)) ## grab all columns that start with the letter x
 ci <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
 
+# Summary Stats
+jags.burn <- window(jags.out)
+summary(jags.burn)
+
+# Plot
 plot(time,ci[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
 
 ecoforecastR::ciEnvelope(time,ci[1,],ci[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
@@ -330,7 +333,8 @@ Question 3 [A]:
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
 
-Where do I find this?
+Process error (tau_add) SD = 1.637258 (second)
+Observation error (tau_obs) SD = 34.930032 (second)
 
 * Explain and discuss the parameter estimates (betas) from the dynamic linear model (what do they mean both biologically and in terms of the predictability of the system) and their correlations
 
