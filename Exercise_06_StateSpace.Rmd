@@ -362,17 +362,59 @@ Repeat the process of forecasting the last 40 observations (convert to NA), this
 * Generate a time-series plot for the CI that includes the observations and both the random walk and DLM models (Hint, think about the order you plot in so you can see both models, also consider including transpancy [alpha] in the CI color)
 
 ```{r}
+# Change the last 40 observations to NA
+gflu_new = gflu
+gflu_new[580:620,] = NA
+y_new = gflu_new$Massachusetts
 
-# Question 3 Plot
-out <- as.matrix(ef.out$predict)
-ci <- apply(exp(out),2,quantile,c(0.025,0.5,0.975))
-plot(time,ci[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
-ecoforecastR::ciEnvelope(time,ci[1,],ci[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
-points(time,y,pch="+",cex=0.5)
+# Fit the model again
+data_new <- list(y=log(y_new),n=length(y_new),      ## data
+             x_ic=log(1000),tau_ic=100, ## initial condition prior
+             a_obs=1,r_obs=1,           ## obs error prior
+             a_add=1,r_add=1            ## process error prior
+             )
+
+nchain = 3
+init_new <- list()
+for(i in 1:nchain){
+  y.samp = sample(y_new,length(y_new),replace=TRUE)
+  init_new[[i]] <- list(tau_add=1/var(diff(log(y.samp))),  ## initial guess on process precision
+                    tau_obs=5/var(log(y.samp)))        ## initial guess on obs precision
+}
+
+j.model   <- jags.model (file = textConnection(RandomWalk),
+                             data = data_new,
+                             inits = init_new,
+                             n.chains = 3)
+
+jags.out   <- coda.samples (model = j.model,
+                            variable.names = c("x","tau_add","tau_obs"),
+                                n.iter = 10000)
+
+# Visualize
+time.rng = c(length(time)-80,length(time))       ## adjust to zoom in and out
+out_1 <- as.matrix(jags.out)         ## convert from coda to matrix  
+x.cols <- grep("^x",colnames(out_1)) ## grab all columns that start with the letter x
+ci_1 <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
+
+# Plot
+out_2 <- as.matrix(ef.out$predict)
+ci_2 <- apply(exp(out_2),2,quantile,c(0.025,0.5,0.975))
+
+plot(time,ci_2[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
+
+#ecoforecastR::ciEnvelope(time,ci_1[1,],ci_1[3,],col=ecoforecastR::col.alpha("purple",0.75))
+ecoforecastR::ciEnvelope(time,ci_2[1,],ci_2[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+
+points(time,y,cex=0.5, pch="+", col = 'red') # original points turned into NA
+points(time,y_new,pch="+",cex=0.5)
+
+legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("red", "black"), cex = 1)
 ```
 
 
 * Comment on how well the DLM model performed (both accuracy and precision) relative to the random walk and the true observations. How could the model be further improved?
+
 
 # Next steps 
 
