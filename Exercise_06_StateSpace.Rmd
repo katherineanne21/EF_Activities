@@ -333,12 +333,20 @@ Question 3 [A]:
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
 
-Process error (tau_add) SD = 1.637258 (second)
-Observation error (tau_obs) SD = 34.930032 (second)
+Process error (tau_add) SD = (first) 1.637258 (second)
+Observation error (tau_obs) SD = (first) 34.930032 (second)
+
+A decrease in process error means that the model improved.
 
 * Explain and discuss the parameter estimates (betas) from the dynamic linear model (what do they mean both biologically and in terms of the predictability of the system) and their correlations
 
-beta_0 is the intercept, beta_1 is the slope of the covariate effect, and beta_X is the slope of the initial condition effect
+beta_0 is the intercept. This represents the expected value when all predictor values are 0. In this model this is the expected level of influenza when Tmin is 0.
+
+beta_1 is the slope of the covariate effect. This represents how much the expected value changes with Tmin. This means that if the value is negative, a lower Tmin indicates a higher influenza. This makes sense as the cold weather seems to be flu season.
+
+beta_X is the slope of the initial condition effect. beta_X is helping us figure out how much our initial conditions change the outcome of the model. beta_X could be any other factors that we didn't think about that influence influenza.
+
+A positive correlation between beta_1 and beta_X indicates that Tmin also impacts the initial conditions.
 
 * Because a state-space model returns X's that are close to the Y's, metrics such as R2 and RMSE aren't great metrics of model performance. Besides looking at the taus, how else could we judge which model is doing better (in a way that avoids/penalizes overfitting)?
 
