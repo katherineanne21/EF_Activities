@@ -403,7 +403,7 @@ ci_2 <- apply(exp(out_2),2,quantile,c(0.025,0.5,0.975))
 
 plot(time,ci_2[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
 
-#ecoforecastR::ciEnvelope(time,ci_1[1,],ci_1[3,],col=ecoforecastR::col.alpha("purple",0.75))
+ecoforecastR::ciEnvelope(time,ci_1[1,],ci_1[3,],col=ecoforecastR::col.alpha("purple",0.75))
 ecoforecastR::ciEnvelope(time,ci_2[1,],ci_2[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
 
 points(time,y,cex=0.5, pch="+", col = 'red') # original points turned into NA
