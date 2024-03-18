@@ -251,7 +251,7 @@ legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("
 * Generate a time-series plot for the CI of x that includes the observations (as above). Use a different color and symbol to differentiate observations that were included in the model versus those that were converted to NA's.
 * Compare the CI between the two runs.
 
-The CI for this second run was mush better. While the CI was wider at all points, none of the points went outside the CI. Additionaly, the end didn't have a massive spread of what the values could be.
+The CI for this second run was must better. While the CI was wider at all points, none of the points went outside the CI. Additionaly, the end didn't have a massive spread of what the values could be.
 
 * Generate a predicted (median) vs observed plot for the data points that were removed
 
@@ -259,11 +259,10 @@ The CI for this second run was mush better. While the CI was wider at all points
 
 * Comment on the accuracy and precision of the state estimates.
 
-This is when the line of the predicted (median) vs observed plot is a 1:1 line correct? And so if it deviates from that it would be not very accurate? but if all of the points deviate at the same place it would be precise?
+
 
 * How does the reduction in data volume affect the parameter estimates (taus)
 
-How do I find the taus?
 
 
 # Dynamic Linear Models
