@@ -405,11 +405,21 @@ lines(time,ci_2[2,],col="lightBlue")
 points(time,y,cex=0.5, pch="+", col = is.na(data3$y)+1)#'red') # original points turned into NA
 #points(time,data3$y,pch="+",cex=0.5)
 
-legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("red", "black"), cex = 1)
+legend("topleft", 
+       legend = c("NA Points", "Original Data", "Random Walk CI", "Covariates CI"), 
+       pch = c("+", "+", NA, NA), 
+       col = c("red", "black", NA, NA), 
+       pt.bg = c(NA, NA, "purple", "lightblue"), 
+       fill = c(NA, NA, "purple", "lightblue"), 
+       border = c(NA, NA, "purple", "lightblue"), 
+       cex = 1)
+
 ```
 
 
 * Comment on how well the DLM model performed (both accuracy and precision) relative to the random walk and the true observations. How could the model be further improved?
+
+The DLM model was more accurate and more precise. The confidence interval was closer to the actual data and the spread was less wide. This model could be improved by adding in more covariates, specifically ones that deal with the seasonality of flus.
 
 
 # Next steps 
