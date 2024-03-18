@@ -102,7 +102,7 @@ jags.out   <- coda.samples (model = j.model,
 Given the full joint posterior samples, we're next going to visualize the output by just looking at the **95% credible interval of the time-series of X's** and compare that to the observed Y's. To do so we'll convert the coda output into a matrix and then calculate the quantiles. Looking at colnames(out) will show you that the first two columns are `tau_add` and `tau_obs`, so we calculate the CI starting from the 3rd column. We also transform the samples back from the log domain to the linear domain.
 ```{r}
 time.rng = c(1,length(time))       ## adjust to zoom in and out
-out <- as.matrix(jags.out)         ## convert from coda to matrix  
+out.RW = out <- as.matrix(jags.out)         ## convert from coda to matrix  
 x.cols <- grep("^x",colnames(out)) ## grab all columns that start with the letter x
 ci <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
 
@@ -164,7 +164,7 @@ jags.out   <- coda.samples (model = j.model,
 
 # Visualize
 time.rng = c(length(time)-80,length(time))       ## adjust to zoom in and out
-out <- as.matrix(jags.out)         ## convert from coda to matrix  
+out.RWF = out <- as.matrix(jags.out)         ## convert from coda to matrix  
 x.cols <- grep("^x",colnames(out)) ## grab all columns that start with the letter x
 ci <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
 
@@ -255,7 +255,7 @@ The CI for this second run was mush better. While the CI was wider at all points
 
 * Generate a predicted (median) vs observed plot for the data points that were removed
 
-Help!!
+
 
 * Comment on the accuracy and precision of the state estimates.
 
@@ -333,8 +333,26 @@ Question 3 [A]:
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
 
-Process error (tau_add) SD = (first) 1.637258 (second)
-Observation error (tau_obs) SD = (first) 34.930032 (second)
+Process error (tau_add) SD = (first) 26.216989 (second)
+Observation error (tau_obs) SD = (first) 233.962712 (second)
+
+```{r}
+## random walk
+taus.RW = which(grepl("tau",colnames(out.RW)))
+tau.sd.RW = apply(out.RW[,taus.RW],2,function(x){mean(1/sqrt(x))})
+tau.sd.RW
+exp(tau.sd.RW)
+
+## model with covariates
+params.out = as.matrix(params)
+taus = grepl("tau",colnames(params.out))
+tau.sd = apply(params.out[,taus],2,function(x){mean(1/sqrt(x))})
+tau.sd
+exp(tau.sd)
+
+sum(tau.sd^2)/sum(tau.sd.RW^2)
+```
+
 
 A decrease in process error means that the model improved.
 
@@ -363,51 +381,29 @@ Repeat the process of forecasting the last 40 observations (convert to NA), this
 
 ```{r}
 # Change the last 40 observations to NA
-gflu_new = gflu
-gflu_new[580:620,] = NA
-y_new = gflu_new$Massachusetts
+## fit the model
+data3  <- data
+data3$y[length(data3$y)-0:39] = NA
+ef.out3 <- ecoforecastR::fit_dlm(model=list(obs="y",fixed="~ 1 + X + Tmin"),data3)
 
-# Fit the model again
-data_new <- list(y=log(y_new),n=length(y_new),      ## data
-             x_ic=log(1000),tau_ic=100, ## initial condition prior
-             a_obs=1,r_obs=1,           ## obs error prior
-             a_add=1,r_add=1            ## process error prior
-             )
-
-nchain = 3
-init_new <- list()
-for(i in 1:nchain){
-  y.samp = sample(y_new,length(y_new),replace=TRUE)
-  init_new[[i]] <- list(tau_add=1/var(diff(log(y.samp))),  ## initial guess on process precision
-                    tau_obs=5/var(log(y.samp)))        ## initial guess on obs precision
-}
-
-j.model   <- jags.model (file = textConnection(RandomWalk),
-                             data = data_new,
-                             inits = init_new,
-                             n.chains = 3)
-
-jags.out   <- coda.samples (model = j.model,
-                            variable.names = c("x","tau_add","tau_obs"),
-                                n.iter = 10000)
 
 # Visualize
 time.rng = c(length(time)-80,length(time))       ## adjust to zoom in and out
-out_1 <- as.matrix(jags.out)         ## convert from coda to matrix  
-x.cols <- grep("^x",colnames(out_1)) ## grab all columns that start with the letter x
-ci_1 <- apply(exp(out[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
+x.cols <- grep("^x",colnames(out.RWF)) ## grab all columns that start with the letter x
+ci_1 <- apply(exp(out.RWF[,x.cols]),2,quantile,c(0.025,0.5,0.975)) ## model was fit on log scale
 
 # Plot
-out_2 <- as.matrix(ef.out$predict)
+out_2 <- as.matrix(ef.out3$predict)
 ci_2 <- apply(exp(out_2),2,quantile,c(0.025,0.5,0.975))
 
 plot(time,ci_2[2,],type='n',ylim=range(y,na.rm=TRUE),ylab="Flu Index",log='y',xlim=time[time.rng])
 
 ecoforecastR::ciEnvelope(time,ci_1[1,],ci_1[3,],col=ecoforecastR::col.alpha("purple",0.75))
 ecoforecastR::ciEnvelope(time,ci_2[1,],ci_2[3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+lines(time,ci_2[2,],col="lightBlue")
 
-points(time,y,cex=0.5, pch="+", col = 'red') # original points turned into NA
-points(time,y_new,pch="+",cex=0.5)
+points(time,y,cex=0.5, pch="+", col = is.na(data3$y)+1)#'red') # original points turned into NA
+#points(time,data3$y,pch="+",cex=0.5)
 
 legend("topleft", legend = c("NA Points", "Original Data"), pch = "+", col = c("red", "black"), cex = 1)
 ```
