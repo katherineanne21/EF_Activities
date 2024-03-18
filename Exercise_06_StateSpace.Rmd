@@ -333,8 +333,8 @@ Question 3 [A]:
 
 * Compare the process and observation error estimates and model CI between this fit and the original random walk model. How much has the residual variance been reduced by?
 
-Process error (tau_add) SD = (first) 26.216989 (second)
-Observation error (tau_obs) SD = (first) 233.962712 (second)
+Process error (tau_add) SD = 0.2076798 (random walk) 0.19557408 (covariate)
+Observation error (tau_obs) SD = 0.1271641 (random walk) 0.06595244 (covariate)
 
 ```{r}
 ## random walk
@@ -354,7 +354,7 @@ sum(tau.sd^2)/sum(tau.sd.RW^2)
 ```
 
 
-A decrease in process error means that the model improved.
+A decrease in process error means that the model improved. The process error decreased from 0.2076798 to 0.19557408. It decreased to 71% of the original value.
 
 * Explain and discuss the parameter estimates (betas) from the dynamic linear model (what do they mean both biologically and in terms of the predictability of the system) and their correlations
 
