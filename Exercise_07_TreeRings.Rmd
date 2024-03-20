@@ -370,41 +370,6 @@ Second, let's look at the histogram of our fixed effect, mu, and the precisions.
 ```
 
 
-Third, let's look at the random effects. It is easy enough to plot the year effects by year. For the individual effects we'll plot these twice, first ordering the effects by plot and the second ordering them by species. Note that this chunk of code will not plot ANYTHING until the year and/or individual effects are added to the model.
-
-```{r}
-  load("data/combined.07.RData")
-  par(mfrow=c(1,1))
-  ### YEAR
-  year.cols = grep("year",colnames(out))
-  if(length(year.cols>0)){
-    ci.yr <- apply(out[,year.cols],2,quantile,c(0.025,0.5,0.975))
-    plot(data$time,ci.yr[2,],type='n',ylim=range(ci.yr,na.rm=TRUE),main="Year Effect",ylab="cm")
-    ciEnvelope(data$time,ci.yr[1,],ci.yr[3,],col="lightBlue")
-    lines(data$time,ci.yr[2,],lty=1,lwd=2)
-    abline(h=0,lty=2)
-  }
-  
-  ### INDIV
-  ind.cols= which(substr(colnames(out),1,3)=="ind")
-  if(length(ind.cols)>0){
-    boxplot(out[,ind.cols],horizontal=TRUE,outline=FALSE,col=combined$PLOT,main="Individual Effects By Plot",xlab="cm")
-    abline(v=0,lty=2)
-    ## calculate plot-level means for random effects
-    tapply(apply(out[,ind.cols],2,mean),combined$PLOT,mean)
-    table(combined$PLOT)
-    
-    spp = combined$SPP
-    boxplot(out[order(spp),ind.cols],horizontal=TRUE,outline=FALSE,col=spp[order(spp)],main="Individual Effects By Species",xlab="cm")
-    abline(v=0,lty=2)
-    spp.code = levels(spp)[table(spp)>0]
-    legend("bottomright",legend=rev(spp.code),col=rev(which(table(spp)>0)),lwd=4)
-    ## calculate species-level means for random effects
-    tapply(apply(out[,ind.cols],2,mean),combined$SPP,mean)
-  }
-```
-
-
 
 By default this code is set to run with a small number of years (15), and a much too low number of MCMC iterations (500), just so that the code with "knit" quickly initially. **For your analyses you should obviously increase these** -- I found that convergence was adequate with around 20,000 samples, though I probably would run 10x longer than that for a publishable analysis. However, such an analysis would take hours to run.
 
@@ -593,6 +558,41 @@ compare mu,
 5. Write the JAGS code that would fit the proposed model (note: you don't have to track down additional covariate data or run this model, just propose the code) [A]
 
 **BECAUSE THE PRODUCTION VERSION OF THIS CODE TAKES A LONG TIME TO RUN, PLEASE SUBMIT THE KNIT HTML NOT THE Rmd**
+
+
+Third, let's look at the random effects. It is easy enough to plot the year effects by year. For the individual effects we'll plot these twice, first ordering the effects by plot and the second ordering them by species. Note that this chunk of code will not plot ANYTHING until the year and/or individual effects are added to the model.
+
+```{r}
+  load("data/combined.07.RData")
+  par(mfrow=c(1,1))
+  ### YEAR
+  year.cols = grep("year",colnames(out.random))
+  if(length(year.cols>0)){
+    ci.yr <- apply(out.random[,year.cols],2,quantile,c(0.025,0.5,0.975))
+    plot(data$time,ci.yr[2,],type='n',ylim=range(ci.yr,na.rm=TRUE),main="Year Effect",ylab="cm")
+    ciEnvelope(data$time,ci.yr[1,],ci.yr[3,],col="lightBlue")
+    lines(data$time,ci.yr[2,],lty=1,lwd=2)
+    abline(h=0,lty=2)
+  }
+  
+  ### INDIV
+  ind.cols= which(substr(colnames(out.random),1,3)=="ind")
+  if(length(ind.cols)>0){
+    boxplot(out.random[,ind.cols],horizontal=TRUE,outline=FALSE,col=combined$PLOT,main="Individual Effects By Plot",xlab="cm")
+    abline(v=0,lty=2)
+    ## calculate plot-level means for random effects
+    tapply(apply(out.random[,ind.cols],2,mean),combined$PLOT,mean)
+    table(combined$PLOT)
+    
+    spp = combined$SPP
+    boxplot(out.random[order(spp),ind.cols],horizontal=TRUE,outline=FALSE,col=spp[order(spp)],main="Individual Effects By Species",xlab="cm")
+    abline(v=0,lty=2)
+    spp.code = levels(spp)[table(spp)>0]
+    legend("bottomright",legend=rev(spp.code),col=rev(which(table(spp)>0)),lwd=4)
+    ## calculate species-level means for random effects
+    tapply(apply(out.random[,ind.cols],2,mean),combined$SPP,mean)
+  }
+```
 
 ## Applying this to your own forecast
 
