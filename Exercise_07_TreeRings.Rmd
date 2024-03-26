@@ -381,7 +381,7 @@ Assignment:
 
 ```{r, fig.asp=0.8}
 
-n.iter = 10000                           ## INCREASE THIS NUMBER FOR ACTUAL ANALYSES **************************************
+n.iter = 20000                           ## INCREASE THIS NUMBER FOR ACTUAL ANALYSES **************************************
 
 ## this code fuses forest inventory data with tree growth data (tree ring or dendrometer band)
 ## for the same plots. Code is a rewrite of Clark et al 2007 Ecol Appl into JAGS
@@ -533,12 +533,16 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
   }
   if(length(vars)>1) pairs(out.random[,vars])
 
+  tau_means = rep(NA, 5)
+  
   ## Standard Deviations
   par(mfrow=c(2,3))
   prec = out.random[,grep("tau",colnames(out.random))] ## select just taus to plot
   for(i in 1:ncol(prec)){
     hist(1/sqrt(prec[,i]),main=colnames(prec)[i])
+    tau_means[i] = mean(1/sqrt(prec[,i]))
   }
+  print(tau_means)
   cor(prec)
   pairs(prec)
 ```
@@ -546,19 +550,79 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 * Make sure to check convergence, burn-in, and effective sample size. [A]
 * Compare model fit and parameter estimates to the previous run.[A] 
 
-compare mu, 
+Tau add (process) was bigger which means there is less unexplained variability in the model. This means precision increased and variance decreased. 
 
 * What is the relative partitioning of uncertainties in the different versions of the model among observation error, process error, and the different random effects? [B]
 
-
+Most of the error is in tau_dbh at a mean of 0.57. tau_add and tau_inc have similar means at roughly 0.096. tau_ind is slightly higher than tau_yr with means of 0.133 and 0.123 respectively. 
 
 * What does the size of these effects suggest about the drivers of uncertainty in tree growth? [B]
 
+Most of the error is in the diameter measurement. This makes sense as taking a measuring tape to a tree is a very difficult way to accurately gain data. Additionally, more uncertainty is due to individual tree growth than year to year tree growth.
+
 3. Based on the diagnostics, propose an additional effect (fixed or random) to add to the model. Such an effect should plausibly chip away at a sizable fraction of the unexplained variability -- you wouldn't want to propose an effect that isn't associated with systematic variability. [A]
+
+I would add an additional effect to explain individual variability. An example could be something along the lines of species.
 
 4. Explain any additional exploratory analyses you would perform (e.g. plotting your proposed covariate against one of the random effects). [B]
 
+I would most likely try and see how correlated species variablity is with individual variablility. I would plot species vs individual and see how the scatter plot turns out.
+
 5. Write the JAGS code that would fit the proposed model (note: you don't have to track down additional covariate data or run this model, just propose the code) [A]
+
+```
+model{
+  
+### Loop over all individuals
+for(i in 1:ni){
+  
+  #### Data Model: DBH
+  for(t in 1:nt){
+    z[i,t] ~ dnorm(x[i,t],tau_dbh)
+  }
+  
+  #### Data Model: growth
+  for(t in 2:nt){
+    inc[i,t] <- x[i,t]-x[i,t-1]
+    y[i,t] ~ dnorm(inc[i,t],tau_inc)
+  }
+  
+  #### Process Model
+  for(t in 2:nt){
+    Dnew[i,t] <- x[i,t-1] + mu + ind[i] + year[t] + beta[species[i]]
+    x[i,t]~dnorm(Dnew[i,t],tau_add)
+  }
+  
+  ## individual effects
+  ind[i] ~ dnorm(0,tau_ind)
+  
+  ## initial condition
+  x[i,1] ~ dnorm(x_ic,tau_ic)
+  
+}  ## end loop over individuals
+  
+  ## year effects
+  for(t in 1:nt){
+    year[t] ~ dnorm(0,tau_yr)
+  }
+  
+  ## species effects
+  # ns is number of species
+  for(s in 1:ns){
+  beta[s] ~ dnorm(0,0.1)
+  }
+  
+
+  #### Priors
+  tau_dbh ~ dgamma(a_dbh,r_dbh)
+  tau_inc ~ dgamma(a_inc,r_inc)
+  tau_add ~ dgamma(a_add,r_add)
+  tau_ind ~ dgamma(1,0.1)
+  tau_yr  ~ dgamma(1,0.1)
+  mu ~ dnorm(0.5,0.5)
+  
+  }
+```
 
 **BECAUSE THE PRODUCTION VERSION OF THIS CODE TAKES A LONG TIME TO RUN, PLEASE SUBMIT THE KNIT HTML NOT THE Rmd**
 
@@ -587,7 +651,7 @@ Third, let's look at the random effects. It is easy enough to plot the year effe
     tapply(apply(out.random[,ind.cols],2,mean),combined$PLOT,mean)
     table(combined$PLOT)
     
-    spp = combined$SPP
+    spp = as.factor(combined$SPP)
     boxplot(out.random[order(spp),ind.cols],horizontal=TRUE,outline=FALSE,col=spp[order(spp)],main="Individual Effects By Species",xlab="cm")
     abline(v=0,lty=2)
     spp.code = levels(spp)[table(spp)>0]
