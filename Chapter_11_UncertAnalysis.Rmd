@@ -257,7 +257,7 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 **Question 2: [A]** 
 A) Describe the pattern and relative magnitude of the parameter uncertainty and compare this to your expectations. 
 
-According table 1, the parameter uncertainty won't average out when aggregated through time. However, this graph shows a steady uncertainty at roughly 500.
+According table 1, the parameter uncertainty won't average out when aggregated through time. This is shown in our graph because as time increases the red uncertainty stays roughly the same. This is also what I would expect because simply running the model for longer shouldn't affect how certain the model is.
 
 B) Using the existing model and Monte Carlo approach, describe how you might partition the contribution of each parameter (r, Kg, alpha, beta) to the forecast uncertainty.
 
@@ -301,6 +301,9 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 ```
 
 **Question 3: [A]** As before, describe the pattern of how driver uncertainty contributes to the forecast and compare that to our first principles expectations.
+
+According to Table 1, 
+
 
 ### Process uncertainty
 
