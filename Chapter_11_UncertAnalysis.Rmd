@@ -228,6 +228,8 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 
 **Question 1: [A]** Describe the pattern to the initial condition uncertainty and compare that to your expectations (e.g. Table 1).
 
+According to Table 1, the initial condition uncertainty should change exponentially. Our graph does not do that as it is relatively limited to an N value of 500.
+
 ### Parameter uncertainty
 
 Next, let's add parameter uncertainty to our forecast. To do this we'll want to sample the **joint** parameter posterior distribution using the row numbers as before. In this forecast we're still running `r Nmc` model runs, but now each run get's its own unique parameters _and_ its own unique initial conditions. We expect the total uncertainty to increase, so we can layer the run with both uncertainties on top of the run with just initial conditions to get a feel for how much more uncertainty is added when we incorporate parameter uncertainty.
@@ -254,7 +256,12 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 
 **Question 2: [A]** 
 A) Describe the pattern and relative magnitude of the parameter uncertainty and compare this to your expectations. 
+
+According table 1, the parameter uncertainty won't average out when aggregated through time. However, this graph shows a steady uncertainty at roughly 500.
+
 B) Using the existing model and Monte Carlo approach, describe how you might partition the contribution of each parameter (r, Kg, alpha, beta) to the forecast uncertainty.
+
+
 
 ### Driver uncertainty
 
