@@ -228,7 +228,7 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 
 # **Question 1: [A]** Describe the pattern to the initial condition uncertainty and compare that to your expectations (e.g. Table 1).
 
-According to Table 1, the initial condition uncertainty should change exponentially. Our graph does not do that as it is relatively limited to an N value of 500.
+According to Table 1, the initial condition uncertainty should change exponentially. This did happen because the black line gets much thinner very quickly. The model is stable and so it tends to its stability point.
 
 ### Parameter uncertainty
 
@@ -261,7 +261,7 @@ According table 1, the parameter uncertainty won't average out when aggregated t
 
 B) Using the existing model and Monte Carlo approach, describe how you might partition the contribution of each parameter (r, Kg, alpha, beta) to the forecast uncertainty.
 
-
+You could just sample one parameter and sample each parameter on it's own.
 
 ### Driver uncertainty
 
@@ -302,7 +302,7 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 
 # **Question 3: [A]** As before, describe the pattern of how driver uncertainty contributes to the forecast and compare that to our first principles expectations.
 
-According to Table 1, 
+According to Table 1, the uncertainty will get greater with time. The green gets wider as time increases. This is because the forecast itself is taking in uncertainty.
 
 
 ### Process uncertainty
@@ -334,6 +334,8 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 
 # **Question 4: [A]** Why might the relative contribution of the process error decline with time? Does this match expectations?
 
+The process error becomes less important with time (temporal scale). We are averaging out the error over time.
+
 ### Random Effect uncertainty
 
 The last figure above represent our best forecast if we're making an **in-sample** prediction (i.e. forecasting one of the sites that we have previously studied). However, if we are making an **out-of-sample** prediction to a new site then there is an additional source of uncertainty that needs to be considered -- the unexplained site-to-site variability being captured by the random effect. When we're making an in-sample prediction we use the posterior $\alpha$ associated with that specific site, but for a new site we need to move up a level in the hierarchical model and sample new alpha values using the across-site precision, $\tau_{site}$. While the out-of-sample forecast is going to have greater uncertainty (which makes intuitive sense and is a desirable feature), there's no guarantee that the in-sample prediction is within the predictive interval of the out-of-sample prediction because the focal site might have been above- or below-average relative to the across-site mean.
@@ -364,6 +366,34 @@ lines(time2,N.I.ci[2,],lwd=0.5)
 ```
 
 # **Question 5: [B]** The last step added random effects, but this uncertainty could be further partitioned into two parts: the ecological site-to-site variability in the population processes, and the parameter uncertainty about the site-to-site variance. To partition these out repeat the random effect partitioning analysis setting `tau.mc` to its posterior mean. How does this change your results? How much of the random effect uncertainty is due to ecological variability versus uncertainty about `tau.mc`?
+
+```{r}
+## Random effect samples
+tau.mc <- 1/sqrt(params[prow,"tau_site"]) ## convert from precision to std deviation
+aNew.mc <- rnorm(Nmc,0,mean(tau.mc))            ## draw out-of-sample predictions of alpha at a new site
+
+N.IPDEA1 <- forecastN(IC=IC[prow,"N[6,30]"],    ## sample IC
+                   ppt=ppt_ensemble[drow,],    ## Sample drivers
+                   r=params[prow,"r_global"],  ## sample parameters
+                   Kg=params[prow,"K_global"],
+                   beta=params[prow,"beta"],
+                   alpha=aNew.mc,              ## sample random effect
+                   Q=Qmc,                      ## process error
+                   n=Nmc)
+
+## Plot run
+plot.run()
+N.IPDEA1.ci = apply(N.IPDEA,2,quantile,c(0.025,0.5,0.975))
+ecoforecastR::ciEnvelope(time2,N.IPDEA.ci[1,],N.IPDEA.ci[3,],col=col.alpha(N.cols[5],trans))
+ecoforecastR::ciEnvelope(time2,N.IPDEA1.ci[1,],N.IPDEA1.ci[3,],col=col.alpha("lightblue",trans))
+ecoforecastR::ciEnvelope(time2,N.IPDE.ci[1,],N.IPDE.ci[3,],col=col.alpha(N.cols[4],trans))
+ecoforecastR::ciEnvelope(time2,N.IPD.ci[1,],N.IPD.ci[3,],col=col.alpha(N.cols[3],trans))
+ecoforecastR::ciEnvelope(time2,N.IP.ci[1,],N.IP.ci[3,],col=col.alpha(N.cols[2],trans))
+ecoforecastR::ciEnvelope(time2,N.I.ci[1,],N.I.ci[3,],col=col.alpha(N.cols[1],trans))
+lines(time2,N.I.ci[2,],lwd=0.5)
+```
+
+The site to site variability is dominating and not the tau site. This is because we don't see a difference.
 
 # Uncertainty Analysis
 
@@ -400,6 +430,8 @@ legend("topleft",legend=c("Process","Driver","Parameter","InitCond"),col=rev(N.c
 
 
 # **Question 6: [A]**  Based on results, where would you focus your research efforts next if your aim was to improve out-of-sample predictions? What about improving in-sample predictions? What is the current balance between process and parameter error and what does that tell us about the potential value of increasing model complexity?
+
+The out-of-sample variance was dominated by Random Effects. One way to change this would be to look at a fixed effect that may be different from site to site (for example soil). The in-sample variance was dominated by process error. The only way to change this is to make a better model. Increasing model complexity would decrease the process error.
 
 ## Next steps [C: extra credit for 1 of the 3 options below]:
 
