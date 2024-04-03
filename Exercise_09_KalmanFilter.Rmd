@@ -193,13 +193,13 @@ With the Kalman Filter function defined, we need to define the inputs to the fun
 Y   = log10(y)
 
 ## options for process model 
-alpha = 0        ## assume no spatial flux
-#alpha = 0.05    ## assume a large spatial flux
+#alpha = 0        ## assume no spatial flux
+alpha = 0.05    ## assume a large spatial flux
 M = adj*alpha + diag(1-alpha*apply(adj,1,sum))  ## random walk with flux
 
 ## options for process error covariance
-#Q = tau_proc            ## full process error covariance matrix
-Q = diag(diag(tau_proc))        ## diagonal process error matrix
+Q = tau_proc            ## full process error covariance matrix
+#Q = diag(diag(tau_proc))        ## diagonal process error matrix
 
 ## observation error covariance (assumed independent)  
 R = diag(tau_obs,nstates) 
@@ -273,11 +273,23 @@ Run the KF under all four combinations of covariance in the process model versus
 
 Task 1, KF00 [A]: Run the default analysis, KF00, with no spatial flux in the process model, and no spatial covariance in the process error
 
+(set alpha to 0)
+
 Task 2, KF01 [A]: Rerun with process error set to the full covariance matrix of Q, compare the results with the original -- what impact does including covariance in the process error have on the inference?
+
+(process error but no process model)
+
+Maine, Vermont, and Rhode Island all had semi circle confidence intervals at the start of the graphs but now they are more restricted to the data itself. This is because we don't have data at the beginning for these states.
 
 Task 3, KF10 [B]: Rerun with alpha = 0.05 but switch back to the *diagonal* Q matrix (no spatial covariance). Comparing KF10 to KF00, what impact does including a spatial flux in the process model have on the inference?
 
+(process model but no process error)
+
+The confidence interval for Maine, Vermont, and Rhode Island is even closer to the data now that we included the spatial flux.
+
 Task 4, KF11 [A]: Rerun with alpha = 0.05 and the full process error covariance Q matrix. Compare KF11 to the previous runs -- what impact does including both a spatial process and a process error covariance have over their impacts individually.
+
+The confidence interval for Maine, Vermont, and Rhode Island is even closer to the data now that we included the spatial flux and a process error covariance.
 
 Task 5 [A]: In a true forecasting situation you don't have all the data in hand at once. You also often want to make a forecast that is farther than one time-step into the future. **Write an R function you could run daily** that would:
 
@@ -289,6 +301,11 @@ Task 5 [A]: In a true forecasting situation you don't have all the data in hand 
 You should leverage the existing `KalmanAnalysis` and `KalmanForecast` functions in your new function, and you shouldn't need to change anything in or about those functions.
 
 Note: in a real world situation, where your forecast model has driver/covariate data, you would actually want to first re-run the forecast from yesterday to today with the actual (now observed) driver/covariate data, rather than using your archived forecast (which was done based on your forecasted covariate/driver data), before assimilating today's new observations of your response data.
+
+```{r}
+
+```
+
 
 Task 6 [C: Extra Credit]:
 Using the run with alpha=0.05 and full process error covariance Q, apply your forecast function to make, and visualize, 5 iterative forecasts. Hint: when visualizing, remember that each forecast starts from a different day.
