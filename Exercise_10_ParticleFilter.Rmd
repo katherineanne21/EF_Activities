@@ -296,7 +296,7 @@ step. After this we'll generate some basic diagnostic plots for the model.
 
 ```{r}
 X = X.orig                             ## initial condition
-nt = nrow(inputs)#17 * 48                           ## 17 days of 30min; production run should be nrow(inputs) *********
+nt = 365 * 48                           ## 17 days of 30min; production run should be nrow(inputs) *********
 output = array(0.0, c(nt, ne, 12))     ## output storage [time step,ensembles,variables]
 
 ## foreward ensemble simulation
@@ -610,10 +610,12 @@ I ran the code two times. One with ne at 100 and one with ne at 1000. The main d
 
 **Question 2**: After 17-days, how different are the simulations with and without particle resampling?
 
-
+After 17-days, the non-resampling PF seems to be following the trend of the data a bit better than the one with resampling. The CI goes up at the end just like the data does and it's a bit skinnier of an area.
 
 **Question 3**: With the particles at 500, increase the length of the simulation from 17 days
 to 365 days.  Do the results match your expectations?
+
+
 
 **Question 4**: After 365-days, how different are the simulations with and without particle resampling?
 
