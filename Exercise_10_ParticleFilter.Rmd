@@ -126,7 +126,7 @@ There are a few assumptions in developing the initial conditions
 
 ```{r}
 #### SET THE ENSEMBLE SIZE
-ne = 1000 ## production run should be 200 - 5000, depending on what your computer can handle
+ne = 100 ## production run should be 200 - 5000, depending on what your computer can handle
 
 ### Initial State (Mg/ha)
 ### These specific data points were extracted from the Ameriflux BADM files
