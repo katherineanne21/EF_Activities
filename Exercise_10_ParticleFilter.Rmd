@@ -606,7 +606,11 @@ for(i in 1:length(params)){      ## loop over parameters
 
 **Question 1**: Increase the number of particles to 500.  How does this change your results?
 
+I ran the code two times. One with ne at 100 and one with ne at 1000. The main difference I saw was that as ne increased, the smoothness of the lines and confidence intervals also increased. This makes sense as the forecast can now make better predictions with a higher ne.
+
 **Question 2**: After 17-days, how different are the simulations with and without particle resampling?
+
+
 
 **Question 3**: With the particles at 500, increase the length of the simulation from 17 days
 to 365 days.  Do the results match your expectations?
