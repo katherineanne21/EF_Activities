@@ -126,7 +126,7 @@ There are a few assumptions in developing the initial conditions
 
 ```{r}
 #### SET THE ENSEMBLE SIZE
-ne = 100 ## production run should be 200 - 5000, depending on what your computer can handle
+ne = 1000 ## production run should be 200 - 5000, depending on what your computer can handle
 
 ### Initial State (Mg/ha)
 ### These specific data points were extracted from the Ameriflux BADM files
@@ -549,6 +549,35 @@ for(i in 1:length(LAIr)){
 legend("topleft",legend = names.pf, col=col.pf, lwd=5)
 ```
 
+```{r}
+for(i in 1:12){  ## loop over variables
+  
+  xpr = t(apply(output[, , i], 2, tapply, window, mean)) ## summarize PF LAI at measurement frequency
+  xpr.ci = apply(xpr, 2, quantile, c(0.025,0.5,0.975))     ## calculate median and CI
+  
+  x.f = t(apply(output.ensemble[, , i], 2, tapply, window, mean)) ## summarize PF LAI at measurement frequency
+  x.f.ci = apply(x.f, 2, quantile, c(0.025,0.5,0.975))     ## calculate median and CI
+  
+  xpf = matrix(NA, 3, nobs)              ## storage [intervals,time]
+  for(ii in 1:nobs){
+    ## calculate weighted median and CI
+    xpf[, ii] = wtd.quantile(x.f[, ii], LAIlike[, ii] / wbar[ii], c(0.025, 0.5, 0.975))  
+  }
+  
+  ci = apply(out.daily[, , i], 1, quantile, c(0.025, 0.5, 0.975))   ## calculate CI over ensemble members
+  plot(Mtime[Msel],x.f.ci[2, ], main = varnames[i], 
+       xlab = "time", ylab = units[i], type='l',ylim  =range(ci))
+  
+  ciEnvelope(Mtime[Msel], x.f.ci[1, ], x.f.ci[3, ], col = col.alpha("lightGrey", 0.5)) ## plot interval
+  ciEnvelope(Mtime[Msel], xpf[1, ], xpf[3, ], col = col.pf[2])       ## non-resampling PF
+  ciEnvelope(Mtime[Msel], xpr.ci[1, ], xpr.ci[3, ], col = col.pf[3]) ## resampling PF
+  lines(ci[2, ]) ## plot median
+  
+  legend("topleft",legend = names.pf, col=col.pf, lwd=5)
+}
+```
+
+
 Finally, the resampling PF also updates the parameter distributions, so let's 
 plot the posterior parameter distributions. In doing so it is important to 
 remember that the technique we used does not introduce new parameter draws into 
@@ -615,15 +644,29 @@ After 17-days, the non-resampling PF seems to be following the trend of the data
 **Question 3**: With the particles at 500, increase the length of the simulation from 17 days
 to 365 days.  Do the results match your expectations?
 
-
+After increasing the number of days to 365, I noticed that the data follows a much smoother trend.
 
 **Question 4**: After 365-days, how different are the simulations with and without particle resampling?
+
+Now that there are 365 days, the ensemble, particle resampling and non particle resampling are all different rather than overlapping like before.
 
 **Question 5**: How well are the three simulations able to constrain the other fluxes and 
 state variables that are output by the model (which should be updated in 
 proportion to how much they covary with LAI)? 
 
+The three simulations are able to constrain the fluxes (Ra, GPP, etc) pretty well but the state variables not as much.
+
 **Question 6**: Which parameters were most constrained by LAI? Does this make sense?
+
+The parameters most constrained are SLA (the leaf area), alpha (the light use efficiency), sigma stem (the process error around wood), and falloc 3 (NPP leaf - amount of new leaf biomass). These make sense as they are all directly related to leaf area. Sigma stem is the one outlier though as we don't know much about the wood biomass from LAI so that uncertainty will increase.
+
+
+LAI - amount of leaf area you have relative to ground area
+
+SLA (cut in half)
+alpha (Beers Law)
+sigma stem (process error around wood)
+falloc 3 (NPP leaf - amount of new leaf biomass)
 
 ## Extra Credit
 
